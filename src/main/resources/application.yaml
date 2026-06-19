@@ -1,0 +1,37 @@
+server:
+  port: 8081
+
+app:
+  base-url: http://snapurl.com:8081
+
+spring:
+  application:
+    name: SnapURL
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: YOUR_CLIENT_ID
+            client-secret: YOUR_CLIENT_SECRET
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/snapurl
+    username: root
+    password: 1234
+  driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+      show-sql: true
+
+    properties:
+      hibernate:
+        format_sql: true
+
+
+
+
+
