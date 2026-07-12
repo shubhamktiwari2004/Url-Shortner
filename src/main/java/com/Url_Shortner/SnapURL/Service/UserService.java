@@ -30,21 +30,20 @@ public class UserService implements UserDetailsService {
     @Autowired
     private JWTService jwtService;
 
-    public UserResponse loginUser(String email,String password) {
+    public UserResponse loginUser(String email, String password) {
 
-        UserResponse user = userRepository.findByEmail(email)
-                .map(usr -> new UserResponse(
-                        usr.getId(),
-                        usr.getName(),
-                        usr.getEmail()
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(email, password)
+        );
+
+        return userRepository.findByEmail(email)
+                .map(user -> new UserResponse(
+                        user.getId(),
+                        user.getName(),
+                        user.getEmail()
                 ))
                 .orElseThrow(() ->
                         new UsernameNotFoundException("User not found"));
-
-        return user;
-
-
-
     }
 
     @Override
@@ -57,6 +56,7 @@ public class UserService implements UserDetailsService {
         return org.springframework.security.core.userdetails.User
                 .builder()
                 .username(user.getEmail())
+                .password(user.getPassword())
                 .authorities("USER")
                 .build();
     }
