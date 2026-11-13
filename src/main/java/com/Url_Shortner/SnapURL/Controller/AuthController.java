@@ -15,6 +15,8 @@
     import org.springframework.web.bind.annotation.PostMapping;
     import org.springframework.web.bind.annotation.RequestParam;
     import org.springframework.web.bind.annotation.RestController;
+    import org.springframework.security.authentication.BadCredentialsException;
+    import org.springframework.security.core.userdetails.UsernameNotFoundException;
     
     import java.util.HashMap;
     import java.util.Map;
@@ -29,24 +31,29 @@
         private JWTService jwtService;
 
 
-    
+
         @PostMapping("/login")
         public ResponseEntity<?> login(
                 @RequestParam String email,
                 @RequestParam String password) {
 
-            UserResponse user = userService.loginUser(email, password);
+            try {
+                UserResponse user = userService.loginUser(email, password);
 
-            String token = jwtService.generateToken(user.getEmail());
-    
-            Map<String, Object> response = new HashMap<>();
-    
-            response.put("token", token);
-            response.put("user", user);
-    
-            return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body(response);
+                String token = jwtService.generateToken(user.getEmail());
+
+                Map<String, Object> response = new HashMap<>();
+                response.put("token", token);
+                response.put("user", user);
+
+                return ResponseEntity.ok(response);
+
+            } catch (BadCredentialsException | UsernameNotFoundException e) {
+
+                return ResponseEntity
+                        .status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("message", "Invalid email or password"));
+            }
         }
 
 
